@@ -38,7 +38,6 @@ public class PanelCliente {
                 tabla_clientes.getViewport().setBackground(Color.WHITE);
             }
 
-            // Configuramos los encabezados para que la tabla sea visible en la maqueta
             modeloTabla = new DefaultTableModel(
                     new Object[]{"ID", "Nombre", "Apellido", "Contacto"}, 0
             ) {
@@ -49,5 +48,53 @@ public class PanelCliente {
             };
             tablaClientes.setModel(modeloTabla);
         }
+    }
+
+    public String getNombre() {
+        return nombreTX != null ? nombreTX.getText().trim() : "";
+    }
+
+    public String getApellido() {
+        return apellidoTX != null ? apellidoTX.getText().trim() : "";
+    }
+
+    public String getContacto() {
+        return contactoTX != null ? contactoTX.getText().trim() : "";
+    }
+
+    public DefaultTableModel getModeloTabla() {
+        return modeloTabla;
+    }
+
+    public JTable getTablaClientes() {
+        return tablaClientes;
+    }
+
+    public int getFilaSeleccionada() {
+        return tablaClientes != null ? tablaClientes.getSelectedRow() : -1;
+    }
+
+    public JButton getBotonGuardarCliente() {
+        return botonGuardarCliente;
+    }
+
+    public JButton getBotonModificar() {
+        return botonModificar;
+    }
+
+    public JButton getBotonEliminar() {
+        return botonEliminar;
+    }
+
+    public void cargarFormulario(String nombre, String apellido, String contacto) {
+        if (nombreTX != null) nombreTX.setText(nombre);
+        if (apellidoTX != null) apellidoTX.setText(apellido);
+        if (contactoTX != null) contactoTX.setText(contacto);
+    }
+
+    public void limpiarCampos() {
+        if (nombreTX != null) nombreTX.setText("");
+        if (apellidoTX != null) apellidoTX.setText("");
+        if (contactoTX != null) contactoTX.setText("");
     }
 }
