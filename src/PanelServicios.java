@@ -39,7 +39,7 @@ public class PanelServicios {
             }
 
             modeloTabla = new DefaultTableModel(
-                    new Object[]{"ID", "Nombre", "Duración", "Precio"}, 0
+                    new Object[]{"ID", "Nombre", "Duración (min)", "Precio"}, 0
             ) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
@@ -48,5 +48,53 @@ public class PanelServicios {
             };
             tablaServicios.setModel(modeloTabla);
         }
+    }
+
+    public String getNombre() {
+        return nombreTX != null ? nombreTX.getText().trim() : "";
+    }
+
+    public String getDuracion() {
+        return duracionTX != null ? duracionTX.getText().trim() : "";
+    }
+
+    public String getPrecio() {
+        return precioTX != null ? precioTX.getText().trim() : "";
+    }
+
+    public DefaultTableModel getModeloTabla() {
+        return modeloTabla;
+    }
+
+    public JTable getTablaServicios() {
+        return tablaServicios;
+    }
+
+    public int getFilaSeleccionada() {
+        return tablaServicios != null ? tablaServicios.getSelectedRow() : -1;
+    }
+
+    public JButton getBotonGuardarServicio() {
+        return botonGuardarServicio;
+    }
+
+    public JButton getBotonModificar() {
+        return botonModificar;
+    }
+
+    public JButton getBotonEliminar() {
+        return botonEliminar;
+    }
+
+    public void cargarFormulario(String nombre, String duracion, String precio) {
+        if (nombreTX != null) nombreTX.setText(nombre);
+        if (duracionTX != null) duracionTX.setText(duracion);
+        if (precioTX != null) precioTX.setText(precio);
+    }
+
+    public void limpiarCampos() {
+        if (nombreTX != null) nombreTX.setText("");
+        if (duracionTX != null) duracionTX.setText("");
+        if (precioTX != null) precioTX.setText("");
     }
 }

@@ -25,11 +25,13 @@ public class VentanaPrincipal extends JFrame {
         PanelCliente panelCliente = new PanelCliente();
         ClienteControlador clienteControlador = new ClienteControlador(panelCliente);
 
-        // Módulo de Servicios
+        // Módulo de Servicios (MVC)
         PanelServicios panelServicios = new PanelServicios();
+        ServicioControlador servicioControlador = new ServicioControlador(panelServicios);
 
-        // Módulo de Turnos
+        // Módulo de Turnos (MVC)
         PanelTurnos panelTurnos = new PanelTurnos();
+        TurnoControlador turnoControlador = new TurnoControlador(panelTurnos);
 
         // Cargar las vistas en el CardLayout
         panelContenido.add(panelCliente.getPanelPrincipal(), "CLIENTES");
