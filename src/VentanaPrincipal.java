@@ -1,10 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 public class VentanaPrincipal extends JFrame {
 
     private JPanel panelPrincipal;
@@ -19,63 +15,61 @@ public class VentanaPrincipal extends JFrame {
         setTitle("Peluquería Santini - Sistema de Gestión");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        setContentPane(panelPrincipal);
+        if (panelPrincipal != null) {
+            setContentPane(panelPrincipal);
+        } else {
+            panelPrincipal = new JPanel(new BorderLayout());
+            setContentPane(panelPrincipal);
+        }
+
         setSize(850, 550);
         setLocationRelativeTo(null);
 
+        if (panelContenido == null) {
+            panelContenido = new JPanel(new CardLayout());
+            panelPrincipal.add(panelContenido, BorderLayout.CENTER);
+        }
+
         cardLayout = (CardLayout) panelContenido.getLayout();
 
-<<<<<<< HEAD
-        // Módulo de Clientes (MVC)
+        // 1. Módulo Clientes (Tu panel)
         PanelCliente panelCliente = new PanelCliente();
         ClienteControlador clienteControlador = new ClienteControlador(panelCliente);
+        agregarAlContenido(panelCliente.getPanelPrincipal(), "CLIENTES", "Sección de Clientes");
 
-        // Módulo de Servicios (MVC)
-        PanelServicios panelServicios = new PanelServicios();
-        ServicioControlador servicioControlador = new ServicioControlador(panelServicios);
+        // 2. Módulo Servicios
+        try {
+            PanelServicios panelServicios = new PanelServicios();
+            ServicioControlador servicioControlador = new ServicioControlador(panelServicios);
+            agregarAlContenido(panelServicios.getPanelPrincipal(), "SERVICIOS", "Sección de Servicios");
+        } catch (Exception e) {
+            agregarAlContenido(null, "SERVICIOS", "Sección de Servicios (En desarrollo)");
+        }
 
-        // Módulo de Turnos (MVC)
-        PanelTurnos panelTurnos = new PanelTurnos();
-        TurnoControlador turnoControlador = new TurnoControlador(panelTurnos);
+        // 3. Módulo Turnos
+        try {
+            PanelTurnos panelTurnos = new PanelTurnos();
+            TurnoControlador turnoControlador = new TurnoControlador(panelTurnos);
+            agregarAlContenido(panelTurnos.getPanelPrincipal(), "TURNOS", "Sección de Turnos");
+        } catch (Exception e) {
+            agregarAlContenido(null, "TURNOS", "Sección de Turnos (En desarrollo)");
+        }
 
-        // Cargar las vistas en el CardLayout
-        panelContenido.add(panelCliente.getPanelPrincipal(), "CLIENTES");
-        panelContenido.add(panelServicios.getPanelPrincipal(), "SERVICIOS");
-        panelContenido.add(panelTurnos.getPanelPrincipal(), "TURNOS");
-
-        // Navegación
-=======
-
-        PanelCliente panelCliente = new PanelCliente();
-
-
-        ClienteControlador clienteControlador = new ClienteControlador(panelCliente);
-
-
-        JPanel panelServicios = crearPanelPlaceholder("Sección de Servicios");
-        JPanel panelTurnos = crearPanelPlaceholder("Sección de Turnos");
-
-
-        panelContenido.add(panelCliente.getPanelPrincipal(), "CLIENTES");
-        panelContenido.add(panelServicios, "SERVICIOS");
-        panelContenido.add(panelTurnos, "TURNOS");
-
-
->>>>>>> master
-        botonClientes.addActionListener(e -> cardLayout.show(panelContenido, "CLIENTES"));
-        botonServicios.addActionListener(e -> cardLayout.show(panelContenido, "SERVICIOS"));
-        botonTurnos.addActionListener(e -> cardLayout.show(panelContenido, "TURNOS"));
+        // Eventos de Navegación
+        if (botonClientes != null) botonClientes.addActionListener(e -> cardLayout.show(panelContenido, "CLIENTES"));
+        if (botonServicios != null) botonServicios.addActionListener(e -> cardLayout.show(panelContenido, "SERVICIOS"));
+        if (botonTurnos != null) botonTurnos.addActionListener(e -> cardLayout.show(panelContenido, "TURNOS"));
     }
-<<<<<<< HEAD
-}
-=======
 
-    private JPanel crearPanelPlaceholder(String texto) {
-        JPanel panel = new JPanel(new GridBagLayout());
-        JLabel label = new JLabel(texto);
-        label.setFont(new Font("Arial", Font.BOLD, 16));
-        panel.add(label);
-        return panel;
+    private void agregarAlContenido(JPanel panel, String nombreCard, String textoFallback) {
+        if (panel != null) {
+            panelContenido.add(panel, nombreCard);
+        } else {
+            JPanel placeholder = new JPanel(new GridBagLayout());
+            JLabel label = new JLabel(textoFallback);
+            label.setFont(new Font("Arial", Font.BOLD, 16));
+            placeholder.add(label);
+            panelContenido.add(placeholder, nombreCard);
+        }
     }
 }
->>>>>>> master

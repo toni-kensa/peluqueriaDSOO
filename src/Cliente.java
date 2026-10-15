@@ -4,7 +4,7 @@ public class Cliente {
     private String apellido;
     private String contacto;
     private String categoria;
-    private boolean promociones; // Estado booleano asignado a la casilla de verificación
+    private boolean promociones; //  booleano para la casilla de verificación
 
     public Cliente(int id, String nombre, String apellido, String contacto, String categoria, boolean promociones) {
         this.id = id;
