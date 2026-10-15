@@ -29,6 +29,28 @@ public class PanelCliente {
     // 5. Tabla
     private JTable tablaClientes;
 
+    // Constructor que asegura la configuración del DefaultTableModel no editable (Opción 2)
+    public PanelCliente() {
+        inicializarModeloTabla();
+    }
+
+    private void inicializarModeloTabla() {
+        if (tablaClientes == null) {
+            tablaClientes = new JTable();
+        }
+
+        // Asignamos un DefaultTableModel anulando isCellEditable
+        DefaultTableModel model = new DefaultTableModel(
+                new String[]{"ID", "Nombre", "Apellido", "Contacto", "Categoría", "Promociones"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Desactiva la edición directa de celdas en la grilla
+            }
+        };
+        tablaClientes.setModel(model);
+    }
+
     // --- MÉTODOS DE ACCESO (GETTERS) Y LÓGICA DE VISTA ---
 
     public JPanel getPanelPrincipal() {
@@ -55,7 +77,7 @@ public class PanelCliente {
     public JTable getTablaClientes() { return tablaClientes; }
 
     public DefaultTableModel getModeloTabla() {
-        if (tablaClientes != null) {
+        if (tablaClientes != null && tablaClientes.getModel() instanceof DefaultTableModel) {
             return (DefaultTableModel) tablaClientes.getModel();
         }
         return null;

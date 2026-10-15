@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 public class ClienteControlador {
     private final PanelCliente vista;
@@ -11,8 +12,8 @@ public class ClienteControlador {
         this.listaClientes = new ArrayList<>();
 
         poblarComboCategoria();
-        configurarTabla();
         inicializarEventos();
+        refrescarTabla();
     }
 
     private void poblarComboCategoria() {
@@ -22,14 +23,6 @@ public class ClienteControlador {
             vista.getComboCategoria().addItem("Habitual");
             vista.getComboCategoria().addItem("Frecuente");
             vista.getComboCategoria().addItem("VIP");
-        }
-    }
-
-    private void configurarTabla() {
-        if (vista.getModeloTabla() != null) {
-            vista.getModeloTabla().setColumnIdentifiers(new String[]{
-                    "ID", "Nombre", "Apellido", "Contacto", "Categoría", "Promociones"
-            });
         }
     }
 
@@ -51,7 +44,7 @@ public class ClienteControlador {
                 ? (String) vista.getComboCategoria().getSelectedItem()
                 : "Nuevo";
 
-        // Consulta del estado actual del JCheckBox con isSelected() (PDF 3)
+        // Consulta del estado actual del JCheckBox con isSelected()
         boolean aceptaPromos = (vista.getPromociones() != null) && vista.getPromociones().isSelected();
 
         Cliente nuevo = new Cliente(contadorId++, nombre, apellido, contacto, categoria, aceptaPromos);
@@ -71,16 +64,17 @@ public class ClienteControlador {
     }
 
     private void refrescarTabla() {
-        if (vista.getModeloTabla() != null) {
-            vista.getModeloTabla().setRowCount(0);
+        DefaultTableModel model = vista.getModeloTabla();
+        if (model != null) {
+            model.setRowCount(0); // Vacía las filas anteriores de la grilla
             for (Cliente c : listaClientes) {
-                vista.getModeloTabla().addRow(new Object[]{
+                model.addRow(new Object[]{
                         c.getId(),
                         c.getNombre(),
                         c.getApellido(),
                         c.getContacto(),
                         c.getCategoria(),
-                        c.isPromociones() ? "Sí" : "No" // Formateo legible para la grilla
+                        c.isPromociones() ? "Sí" : "No" // Conversión de booleano a texto legible
                 });
             }
         }
