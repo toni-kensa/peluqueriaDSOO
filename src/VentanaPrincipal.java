@@ -1,6 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 public class VentanaPrincipal extends JFrame {
 
     private JPanel panelPrincipal;
@@ -21,6 +25,7 @@ public class VentanaPrincipal extends JFrame {
 
         cardLayout = (CardLayout) panelContenido.getLayout();
 
+<<<<<<< HEAD
         // Módulo de Clientes (MVC)
         PanelCliente panelCliente = new PanelCliente();
         ClienteControlador clienteControlador = new ClienteControlador(panelCliente);
@@ -39,8 +44,38 @@ public class VentanaPrincipal extends JFrame {
         panelContenido.add(panelTurnos.getPanelPrincipal(), "TURNOS");
 
         // Navegación
+=======
+
+        PanelCliente panelCliente = new PanelCliente();
+
+
+        ClienteControlador clienteControlador = new ClienteControlador(panelCliente);
+
+
+        JPanel panelServicios = crearPanelPlaceholder("Sección de Servicios");
+        JPanel panelTurnos = crearPanelPlaceholder("Sección de Turnos");
+
+
+        panelContenido.add(panelCliente.getPanelPrincipal(), "CLIENTES");
+        panelContenido.add(panelServicios, "SERVICIOS");
+        panelContenido.add(panelTurnos, "TURNOS");
+
+
+>>>>>>> master
         botonClientes.addActionListener(e -> cardLayout.show(panelContenido, "CLIENTES"));
         botonServicios.addActionListener(e -> cardLayout.show(panelContenido, "SERVICIOS"));
         botonTurnos.addActionListener(e -> cardLayout.show(panelContenido, "TURNOS"));
     }
+<<<<<<< HEAD
 }
+=======
+
+    private JPanel crearPanelPlaceholder(String texto) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        JLabel label = new JLabel(texto);
+        label.setFont(new Font("Arial", Font.BOLD, 16));
+        panel.add(label);
+        return panel;
+    }
+}
+>>>>>>> master
