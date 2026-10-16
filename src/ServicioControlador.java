@@ -1,16 +1,15 @@
 import javax.swing.JOptionPane;
-import java.util.ArrayList;
 import java.util.List;
 
+// conecta la vista (PanelServicios) con los datos del Servicio (modelo)
 public class ServicioControlador {
 
-    private PanelServicios vista;
-    private List<Servicio> listaServicios;
-    private int contadorId = 1;
+    private final PanelServicios vista;
+    private final ServicioDAO servicioDAO;
 
     public ServicioControlador(PanelServicios vista) {
         this.vista = vista;
-        this.listaServicios = new ArrayList<>();
+        this.servicioDAO = new ServicioDAO();
         inicializarEventos();
     }
 
@@ -64,10 +63,10 @@ public class ServicioControlador {
             return;
         }
 
-        Servicio nuevo = new Servicio(contadorId++, nombre, duracion, precio);
-        listaServicios.add(nuevo);
+        Servicio nuevo = new Servicio(0, nombre, duracion, precio);
+        servicioDAO.guardar(nuevo);
 
-        actualizarTablaVisual();
+        refrescarTabla();
         vista.limpiarCampos();
         JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
                 "Servicio guardado con éxito.",
@@ -107,17 +106,15 @@ public class ServicioControlador {
         }
 
         int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
+        Servicio existente = servicioDAO.buscarPorId(id);
 
-        for (Servicio s : listaServicios) {
-            if (s.getId() == id) {
-                s.setNombre(nombre);
-                s.setDuracion(duracion);
-                s.setPrecio(precio);
-                break;
-            }
+        if (existente != null) {
+            existente.setNombre(nombre);
+            existente.setDuracion(duracion);
+            existente.setPrecio(precio);
         }
 
-        actualizarTablaVisual();
+        refrescarTabla();
         vista.limpiarCampos();
     }
 
@@ -131,17 +128,20 @@ public class ServicioControlador {
         }
 
         int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
-        listaServicios.removeIf(s -> s.getId() == id);
+        servicioDAO.eliminar(id);
 
-        actualizarTablaVisual();
+        refrescarTabla();
         vista.limpiarCampos();
     }
 
-    private void actualizarTablaVisual() {
-        vista.getModeloTabla().setRowCount(0);
-        for (Servicio s : listaServicios) {
-            vista.getModeloTabla().addRow(
-                    new Object[]{s.getId(), s.getNombre(), s.getDuracion(), s.getPrecio()});
+    private void refrescarTabla() {
+        if (vista.getModeloTabla() != null) {
+            vista.getModeloTabla().setRowCount(0);
+            List<Servicio> lista = servicioDAO.obtenerTodos();
+            for (Servicio s : lista) {
+                vista.getModeloTabla().addRow(
+                        new Object[]{s.getId(), s.getNombre(), s.getDuracion(), s.getPrecio()});
+            }
         }
     }
 }

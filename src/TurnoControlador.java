@@ -1,17 +1,15 @@
 import javax.swing.JOptionPane;
-import java.util.ArrayList;
 import java.util.List;
 
-
+// conecta la vista (PanelTurnos) con los datos del Turno (modelo)
 public class TurnoControlador {
 
-    private PanelTurnos vista;
-    private List<Turno> listaTurnos;
-    private int contadorId = 1;
+    private final PanelTurnos vista;
+    private final TurnoDAO turnoDAO;
 
     public TurnoControlador(PanelTurnos vista) {
         this.vista = vista;
-        this.listaTurnos = new ArrayList<>();
+        this.turnoDAO = new TurnoDAO();
         inicializarEventos();
     }
 
@@ -63,10 +61,10 @@ public class TurnoControlador {
             return;
         }
 
-        Turno nuevo = new Turno(contadorId++, cliente, servicio, fecha, hora, "Pendiente");
-        listaTurnos.add(nuevo);
+        Turno nuevo = new Turno(0, cliente, servicio, fecha, hora, "Pendiente");
+        turnoDAO.guardar(nuevo);
 
-        actualizarTablaVisual();
+        refrescarTabla();
         vista.limpiarCampos();
         JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
                 "Turno reservado con éxito.",
@@ -96,19 +94,17 @@ public class TurnoControlador {
         }
 
         int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
+        Turno existente = turnoDAO.buscarPorId(id);
 
-        for (Turno t : listaTurnos) {
-            if (t.getId() == id) {
-                if (!cliente.startsWith("--")) t.setCliente(cliente);
-                if (!servicio.startsWith("--")) t.setServicio(servicio);
-                t.setFecha(fecha);
-                t.setHora(hora);
-                t.setEstado(estado);
-                break;
-            }
+        if (existente != null) {
+            if (!cliente.startsWith("--")) existente.setCliente(cliente);
+            if (!servicio.startsWith("--")) existente.setServicio(servicio);
+            existente.setFecha(fecha);
+            existente.setHora(hora);
+            existente.setEstado(estado);
         }
 
-        actualizarTablaVisual();
+        refrescarTabla();
         vista.limpiarCampos();
     }
 
@@ -122,23 +118,25 @@ public class TurnoControlador {
         }
 
         int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
-        for (Turno t : listaTurnos) {
-            if (t.getId() == id) {
-                t.setEstado("Cancelado");
-                break;
-            }
+        Turno existente = turnoDAO.buscarPorId(id);
+
+        if (existente != null) {
+            existente.setEstado("Cancelado");
         }
 
-        actualizarTablaVisual();
+        refrescarTabla();
         vista.limpiarCampos();
     }
 
-    private void actualizarTablaVisual() {
-        vista.getModeloTabla().setRowCount(0);
-        for (Turno t : listaTurnos) {
-            vista.getModeloTabla().addRow(
-                    new Object[]{t.getId(), t.getCliente(), t.getServicio(),
-                            t.getFecha(), t.getHora(), t.getEstado()});
+    private void refrescarTabla() {
+        if (vista.getModeloTabla() != null) {
+            vista.getModeloTabla().setRowCount(0);
+            List<Turno> lista = turnoDAO.obtenerTodos();
+            for (Turno t : lista) {
+                vista.getModeloTabla().addRow(
+                        new Object[]{t.getId(), t.getCliente(), t.getServicio(),
+                                t.getFecha(), t.getHora(), t.getEstado()});
+            }
         }
     }
 }
