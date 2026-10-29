@@ -43,6 +43,9 @@ public class VentanaPrincipal extends JFrame {
             ServicioControlador servicioControlador = new ServicioControlador(panelServicios);
             agregarAlContenido(panelServicios.getPanelPrincipal(), "SERVICIOS", "Sección de Servicios");
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "No se pudo cargar la sección de Servicios: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
             agregarAlContenido(null, "SERVICIOS", "Sección de Servicios (En desarrollo)");
         }
 
@@ -52,6 +55,9 @@ public class VentanaPrincipal extends JFrame {
             TurnoControlador turnoControlador = new TurnoControlador(panelTurnos);
             agregarAlContenido(panelTurnos.getPanelPrincipal(), "TURNOS", "Sección de Turnos");
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "No se pudo cargar la sección de Turnos: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
             agregarAlContenido(null, "TURNOS", "Sección de Turnos (En desarrollo)");
         }
 

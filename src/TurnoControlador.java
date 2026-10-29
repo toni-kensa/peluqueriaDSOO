@@ -47,7 +47,7 @@ public class TurnoControlador {
         String fecha = vista.getFecha();
         String hora = vista.getHora();
 
-        if (cliente.startsWith("--") || servicio.startsWith("--")) {
+        if (cliente.isEmpty() || servicio.isEmpty() || cliente.startsWith("--") || servicio.startsWith("--")) {
             JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
                     "Seleccioná un cliente y un servicio.",
                     "Atención", JOptionPane.WARNING_MESSAGE);
@@ -97,8 +97,8 @@ public class TurnoControlador {
         Turno existente = turnoDAO.buscarPorId(id);
 
         if (existente != null) {
-            if (!cliente.startsWith("--")) existente.setCliente(cliente);
-            if (!servicio.startsWith("--")) existente.setServicio(servicio);
+            if (!cliente.isEmpty() && !cliente.startsWith("--")) existente.setCliente(cliente);
+            if (!servicio.isEmpty() && !servicio.startsWith("--")) existente.setServicio(servicio);
             existente.setFecha(fecha);
             existente.setHora(hora);
             existente.setEstado(estado);

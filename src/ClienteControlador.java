@@ -31,8 +31,26 @@ public class ClienteControlador {
             vista.getBotonGuardarCliente().addActionListener(e -> guardarCliente());
         }
 
+        if (vista.getBotonModificar() != null) {
+            vista.getBotonModificar().addActionListener(e -> modificarCliente());
+        }
+
         if (vista.getBotonEliminar() != null) {
             vista.getBotonEliminar().addActionListener(e -> eliminarCliente());
+        }
+
+        if (vista.getTablaClientes() != null) {
+            vista.getTablaClientes().getSelectionModel().addListSelectionListener(e -> {
+                if (!e.getValueIsAdjusting() && vista.getFilaSeleccionada() != -1) {
+                    int fila = vista.getFilaSeleccionada();
+                    String nombre = vista.getModeloTabla().getValueAt(fila, 1).toString();
+                    String apellido = vista.getModeloTabla().getValueAt(fila, 2).toString();
+                    String contacto = vista.getModeloTabla().getValueAt(fila, 3).toString();
+                    String categoria = vista.getModeloTabla().getValueAt(fila, 4).toString();
+                    boolean promociones = "Sí".equals(vista.getModeloTabla().getValueAt(fila, 5));
+                    vista.cargarFormulario(nombre, apellido, contacto, categoria, promociones);
+                }
+            });
         }
     }
 
@@ -63,6 +81,47 @@ public class ClienteControlador {
         JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
                 "Cliente guardado con éxito.",
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void modificarCliente() {
+        int filaSeleccionada = vista.getFilaSeleccionada();
+        if (filaSeleccionada < 0) {
+            JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                    "Seleccioná un cliente de la tabla para modificar.",
+                    "Atención", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String nombre = vista.getNombre();
+        String apellido = vista.getApellido();
+        String contacto = vista.getContacto();
+
+        if (nombre.isEmpty() || apellido.isEmpty()) {
+            JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                    "Nombre y Apellido son obligatorios.",
+                    "Atención", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String categoria = (vista.getComboCategoria() != null && vista.getComboCategoria().getSelectedItem() != null)
+                ? (String) vista.getComboCategoria().getSelectedItem()
+                : "Nuevo";
+
+        boolean aceptaPromos = (vista.getPromociones() != null) && vista.getPromociones().isSelected();
+
+        int idCliente = (int) vista.getModeloTabla().getValueAt(filaSeleccionada, 0);
+        Cliente existente = clienteDAO.buscarPorId(idCliente);
+
+        if (existente != null) {
+            existente.setNombre(nombre);
+            existente.setApellido(apellido);
+            existente.setContacto(contacto);
+            existente.setCategoria(categoria);
+            existente.setPromociones(aceptaPromos);
+        }
+
+        refrescarTabla();
+        vista.limpiarCampos();
     }
 
     private void eliminarCliente() {

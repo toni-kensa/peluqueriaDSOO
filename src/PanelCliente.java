@@ -95,10 +95,12 @@ public class PanelCliente {
         return null;
     }
 
-    public void cargarFormulario(String nombre, String apellido, String contacto) {
+    public void cargarFormulario(String nombre, String apellido, String contacto, String categoria, boolean promociones) {
         if (nombreTX != null) nombreTX.setText(nombre);
         if (apellidoTX != null) apellidoTX.setText(apellido);
         if (contactoTX != null) contactoTX.setText(contacto);
+        if (comboCategoria != null) comboCategoria.setSelectedItem(categoria);
+        if (this.promociones != null) this.promociones.setSelected(promociones);
     }
 
     public void limpiarCampos() {

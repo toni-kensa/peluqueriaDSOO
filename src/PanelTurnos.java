@@ -5,11 +5,11 @@ import java.awt.*;
 public class PanelTurnos {
 
     private JPanel panelPrincipal;
-    private JComboBox comboCliente;
-    private JComboBox comboServicio;
+    private JComboBox<String> comboCliente;
+    private JComboBox<String> comboServicio;
     private JTextField fechaTX;
     private JTextField horaTX;
-    private JComboBox comboEstado;
+    private JComboBox<String> comboEstado;
 
     private JButton botonReservar;
     private JButton botonModificar;
@@ -82,11 +82,13 @@ public class PanelTurnos {
     }
 
     public String getClienteSeleccionado() {
-        return comboCliente != null ? comboCliente.getSelectedItem().toString() : "";
+        if (comboCliente == null || comboCliente.getSelectedItem() == null) return "";
+        return comboCliente.getSelectedItem().toString();
     }
 
     public String getServicioSeleccionado() {
-        return comboServicio != null ? comboServicio.getSelectedItem().toString() : "";
+        if (comboServicio == null || comboServicio.getSelectedItem() == null) return "";
+        return comboServicio.getSelectedItem().toString();
     }
 
     public String getFecha() {
@@ -98,7 +100,8 @@ public class PanelTurnos {
     }
 
     public String getEstadoSeleccionado() {
-        return comboEstado != null ? comboEstado.getSelectedItem().toString() : "";
+        if (comboEstado == null || comboEstado.getSelectedItem() == null) return "";
+        return comboEstado.getSelectedItem().toString();
     }
 
     public DefaultTableModel getModeloTabla() {

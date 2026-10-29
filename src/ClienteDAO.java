@@ -17,4 +17,13 @@ public class ClienteDAO {
     public void eliminar(int id) {
         listaClientes.removeIf(c -> c.getId() == id);
     }
+
+    public Cliente buscarPorId(int id) {
+        for (Cliente c : listaClientes) {
+            if (c.getId() == id) {
+                return c;
+            }
+        }
+        return null;
+    }
 }
