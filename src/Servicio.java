@@ -1,10 +1,10 @@
 /**
  * Representa un servicio ofrecido por la peluquería
- * Guarda el nombre,la duración en minutos y el precio
+ * Guarda el nombre, la duración en minutos y el precio
  */
 public class Servicio {
 
-    private int id;
+    private long id;
     private String nombre;
     private int duracion; // en minutos
     private double precio;
@@ -17,7 +17,7 @@ public class Servicio {
      * @param duracion duración en minutos
      * @param precio precio del servicio
      */
-    public Servicio(int id, String nombre, int duracion, double precio) {
+    public Servicio(long id, String nombre, int duracion, double precio) {
         this.id = id;
         this.nombre = nombre;
         this.duracion = duracion;
@@ -29,16 +29,16 @@ public class Servicio {
      *
      * @return el id del servicio
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
 
     /**
-     * establece el id del servicio
+     * Establece el id del servicio
      *
      * @param id el nuevo id del servicio
      */
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

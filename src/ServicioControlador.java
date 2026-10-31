@@ -1,7 +1,7 @@
 import javax.swing.JOptionPane;
 import java.util.List;
 
-// conecta la vista (PanelServicios) con los datos del Servicio (modelo)
+// Conecta la vista (PanelServicios) con los datos del Servicio (modelo) y la base de datos
 public class ServicioControlador {
 
     private final PanelServicios vista;
@@ -11,6 +11,7 @@ public class ServicioControlador {
         this.vista = vista;
         this.servicioDAO = new ServicioDAO();
         inicializarEventos();
+        refrescarTabla(); // Carga inicial de datos desde la BD al abrir
     }
 
     private void inicializarEventos() {
@@ -63,7 +64,8 @@ public class ServicioControlador {
             return;
         }
 
-        Servicio nuevo = new Servicio(0, nombre, duracion, precio);
+        // El ID 0L es temporal, la BD generará el ID autoincremental
+        Servicio nuevo = new Servicio(0L, nombre, duracion, precio);
         servicioDAO.guardar(nuevo);
 
         refrescarTabla();
@@ -105,17 +107,22 @@ public class ServicioControlador {
             return;
         }
 
-        int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
+        // Lectura del ID como long para que coincida con ServicioDAO (Long)
+        long id = Long.parseLong(vista.getModeloTabla().getValueAt(fila, 0).toString());
         Servicio existente = servicioDAO.buscarPorId(id);
 
         if (existente != null) {
             existente.setNombre(nombre);
             existente.setDuracion(duracion);
             existente.setPrecio(precio);
+            servicioDAO.actualizar(existente); // Persiste los cambios en la base de datos
         }
 
         refrescarTabla();
         vista.limpiarCampos();
+        JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                "Servicio modificado con éxito.",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void eliminarServicio() {
@@ -127,11 +134,15 @@ public class ServicioControlador {
             return;
         }
 
-        int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
+        // Lectura del ID como long para que coincida con ServicioDAO (Long)
+        long id = Long.parseLong(vista.getModeloTabla().getValueAt(fila, 0).toString());
         servicioDAO.eliminar(id);
 
         refrescarTabla();
         vista.limpiarCampos();
+        JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                "Servicio eliminado con éxito.",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void refrescarTabla() {

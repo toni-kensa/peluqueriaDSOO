@@ -72,7 +72,7 @@ public class ClienteControlador {
 
         boolean aceptaPromos = (vista.getPromociones() != null) && vista.getPromociones().isSelected();
 
-        Cliente nuevo = new Cliente(0, nombre, apellido, contacto, categoria, aceptaPromos);
+        Cliente nuevo = new Cliente(0L, nombre, apellido, contacto, categoria, aceptaPromos);
         clienteDAO.guardar(nuevo);
 
         refrescarTabla();
@@ -109,7 +109,7 @@ public class ClienteControlador {
 
         boolean aceptaPromos = (vista.getPromociones() != null) && vista.getPromociones().isSelected();
 
-        int idCliente = (int) vista.getModeloTabla().getValueAt(filaSeleccionada, 0);
+        long idCliente = Long.parseLong(vista.getModeloTabla().getValueAt(filaSeleccionada, 0).toString());
         Cliente existente = clienteDAO.buscarPorId(idCliente);
 
         if (existente != null) {
@@ -118,19 +118,26 @@ public class ClienteControlador {
             existente.setContacto(contacto);
             existente.setCategoria(categoria);
             existente.setPromociones(aceptaPromos);
+            clienteDAO.actualizar(existente);
         }
 
         refrescarTabla();
         vista.limpiarCampos();
+        JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                "Cliente modificado con éxito.",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void eliminarCliente() {
-        int filaSeleccionada = vista.getTablaClientes().getSelectedRow();
+        int filaSeleccionada = vista.getFilaSeleccionada();
         if (filaSeleccionada >= 0) {
-            int idCliente = (int) vista.getModeloTabla().getValueAt(filaSeleccionada, 0);
+            long idCliente = Long.parseLong(vista.getModeloTabla().getValueAt(filaSeleccionada, 0).toString());
             clienteDAO.eliminar(idCliente);
             refrescarTabla();
             vista.limpiarCampos();
+            JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                    "Cliente eliminado con éxito.",
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
                     "Seleccioná un cliente de la tabla para eliminar.",

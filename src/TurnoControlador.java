@@ -1,16 +1,42 @@
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import java.util.List;
 
-// conecta la vista (PanelTurnos) con los datos del Turno (modelo)
 public class TurnoControlador {
 
     private final PanelTurnos vista;
     private final TurnoDAO turnoDAO;
+    private final ClienteDAO clienteDAO;
+    private final ServicioDAO servicioDAO;
 
     public TurnoControlador(PanelTurnos vista) {
         this.vista = vista;
         this.turnoDAO = new TurnoDAO();
+        this.clienteDAO = new ClienteDAO();
+        this.servicioDAO = new ServicioDAO();
+
+        poblarCombos();
         inicializarEventos();
+        refrescarTabla();
+    }
+
+    private void poblarCombos() {
+        if (vista.getComboCliente() != null) {
+            vista.getComboCliente().removeAllItems();
+            vista.getComboCliente().addItem("-- Seleccionar cliente --");
+            List<Cliente> clientes = clienteDAO.obtenerTodos();
+            for (Cliente c : clientes) {
+                vista.getComboCliente().addItem("ID: " + c.getId() + " - " + c.getNombre() + " " + c.getApellido());
+            }
+        }
+
+        if (vista.getComboServicio() != null) {
+            vista.getComboServicio().removeAllItems();
+            vista.getComboServicio().addItem("-- Seleccionar servicio --");
+            List<Servicio> servicios = servicioDAO.obtenerTodos();
+            for (Servicio s : servicios) {
+                vista.getComboServicio().addItem("ID: " + s.getId() + " - " + s.getNombre() + " ($" + s.getPrecio() + ")");
+            }
+        }
     }
 
     private void inicializarEventos() {
@@ -30,26 +56,26 @@ public class TurnoControlador {
             vista.getTablaTurnos().getSelectionModel().addListSelectionListener(e -> {
                 if (!e.getValueIsAdjusting() && vista.getFilaSeleccionada() != -1) {
                     int fila = vista.getFilaSeleccionada();
-                    String cliente = vista.getModeloTabla().getValueAt(fila, 1).toString();
-                    String servicio = vista.getModeloTabla().getValueAt(fila, 2).toString();
+                    long clienteId = Long.parseLong(vista.getModeloTabla().getValueAt(fila, 1).toString());
+                    long servicioId = Long.parseLong(vista.getModeloTabla().getValueAt(fila, 2).toString());
                     String fecha = vista.getModeloTabla().getValueAt(fila, 3).toString();
                     String hora = vista.getModeloTabla().getValueAt(fila, 4).toString();
                     String estado = vista.getModeloTabla().getValueAt(fila, 5).toString();
-                    vista.cargarFormulario(cliente, servicio, fecha, hora, estado);
+                    vista.cargarFormulario(clienteId, servicioId, fecha, hora, estado);
                 }
             });
         }
     }
 
     private void reservarTurno() {
-        String cliente = vista.getClienteSeleccionado();
-        String servicio = vista.getServicioSeleccionado();
+        long clienteId = vista.getClienteIdSeleccionado();
+        long servicioId = vista.getServicioIdSeleccionado();
         String fecha = vista.getFecha();
         String hora = vista.getHora();
 
-        if (cliente.isEmpty() || servicio.isEmpty() || cliente.startsWith("--") || servicio.startsWith("--")) {
+        if (clienteId <= 0 || servicioId <= 0) {
             JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
-                    "Seleccioná un cliente y un servicio.",
+                    "Por favor, seleccioná un cliente y un servicio válidos de la lista.",
                     "Atención", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -61,7 +87,7 @@ public class TurnoControlador {
             return;
         }
 
-        Turno nuevo = new Turno(0, cliente, servicio, fecha, hora, "Pendiente");
+        Turno nuevo = new Turno(0L, clienteId, servicioId, fecha, hora, "Pendiente");
         turnoDAO.guardar(nuevo);
 
         refrescarTabla();
@@ -80,8 +106,8 @@ public class TurnoControlador {
             return;
         }
 
-        String cliente = vista.getClienteSeleccionado();
-        String servicio = vista.getServicioSeleccionado();
+        long clienteId = vista.getClienteIdSeleccionado();
+        long servicioId = vista.getServicioIdSeleccionado();
         String fecha = vista.getFecha();
         String hora = vista.getHora();
         String estado = vista.getEstadoSeleccionado();
@@ -93,19 +119,23 @@ public class TurnoControlador {
             return;
         }
 
-        int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
+        long id = Long.parseLong(vista.getModeloTabla().getValueAt(fila, 0).toString());
         Turno existente = turnoDAO.buscarPorId(id);
 
         if (existente != null) {
-            if (!cliente.isEmpty() && !cliente.startsWith("--")) existente.setCliente(cliente);
-            if (!servicio.isEmpty() && !servicio.startsWith("--")) existente.setServicio(servicio);
+            if (clienteId > 0) existente.setClienteId(clienteId);
+            if (servicioId > 0) existente.setServicioId(servicioId);
             existente.setFecha(fecha);
             existente.setHora(hora);
             existente.setEstado(estado);
+            turnoDAO.actualizar(existente);
         }
 
         refrescarTabla();
         vista.limpiarCampos();
+        JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                "Turno modificado con éxito.",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void cancelarTurno() {
@@ -117,24 +147,29 @@ public class TurnoControlador {
             return;
         }
 
-        int id = (int) vista.getModeloTabla().getValueAt(fila, 0);
+        long id = Long.parseLong(vista.getModeloTabla().getValueAt(fila, 0).toString());
         Turno existente = turnoDAO.buscarPorId(id);
 
         if (existente != null) {
             existente.setEstado("Cancelado");
+            turnoDAO.actualizar(existente);
         }
 
         refrescarTabla();
         vista.limpiarCampos();
+        JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                "Turno cancelado con éxito.",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void refrescarTabla() {
+        poblarCombos();
         if (vista.getModeloTabla() != null) {
             vista.getModeloTabla().setRowCount(0);
             List<Turno> lista = turnoDAO.obtenerTodos();
             for (Turno t : lista) {
                 vista.getModeloTabla().addRow(
-                        new Object[]{t.getId(), t.getCliente(), t.getServicio(),
+                        new Object[]{t.getId(), t.getClienteId(), t.getServicioId(),
                                 t.getFecha(), t.getHora(), t.getEstado()});
             }
         }
