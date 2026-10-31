@@ -8,13 +8,11 @@ public class PanelCliente {
     private JPanel panel_botones;
     private JScrollPane tabla_clientes;
 
-
     private JLabel clientes;
     private JLabel nombre;
     private JLabel apellido;
     private JLabel contacto;
     private JLabel Categoria;
-
 
     private JTextField nombreTX;
     private JTextField apellidoTX;
@@ -22,14 +20,11 @@ public class PanelCliente {
     private JComboBox<String> comboCategoria;
     private JCheckBox promociones;
 
-
     private JButton botonGuardarCliente;
     private JButton botonModificar;
     private JButton botonEliminar;
 
-
     private JTable tablaClientes;
-
 
     public PanelCliente() {
         inicializarModeloTabla();
@@ -40,13 +35,12 @@ public class PanelCliente {
             tablaClientes = new JTable();
         }
 
-
         DefaultTableModel model = new DefaultTableModel(
                 new String[]{"ID", "Nombre", "Apellido", "Contacto", "Categoría", "Promociones"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Desactiva la edición directa de celdas en la grilla
+                return false;
             }
         };
         tablaClientes.setModel(model);
@@ -55,8 +49,6 @@ public class PanelCliente {
             tabla_clientes.getViewport().setBackground(Color.WHITE);
         }
     }
-
-
 
     public JPanel getPanelPrincipal() {
         if (panelPrincipal == null) {

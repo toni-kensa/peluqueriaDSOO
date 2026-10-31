@@ -32,12 +32,10 @@ public class VentanaPrincipal extends JFrame {
 
         cardLayout = (CardLayout) panelContenido.getLayout();
 
-        // 1. Módulo Clientes (Tu panel)
         PanelCliente panelCliente = new PanelCliente();
         ClienteControlador clienteControlador = new ClienteControlador(panelCliente);
         agregarAlContenido(panelCliente.getPanelPrincipal(), "CLIENTES", "Sección de Clientes");
 
-        // 2. Módulo Servicios
         try {
             PanelServicios panelServicios = new PanelServicios();
             ServicioControlador servicioControlador = new ServicioControlador(panelServicios);
@@ -49,7 +47,6 @@ public class VentanaPrincipal extends JFrame {
             agregarAlContenido(null, "SERVICIOS", "Sección de Servicios (En desarrollo)");
         }
 
-        // 3. Módulo Turnos
         try {
             PanelTurnos panelTurnos = new PanelTurnos();
             TurnoControlador turnoControlador = new TurnoControlador(panelTurnos);
@@ -61,7 +58,6 @@ public class VentanaPrincipal extends JFrame {
             agregarAlContenido(null, "TURNOS", "Sección de Turnos (En desarrollo)");
         }
 
-        // Eventos de Navegación
         if (botonClientes != null) botonClientes.addActionListener(e -> cardLayout.show(panelContenido, "CLIENTES"));
         if (botonServicios != null) botonServicios.addActionListener(e -> cardLayout.show(panelContenido, "SERVICIOS"));
         if (botonTurnos != null) botonTurnos.addActionListener(e -> cardLayout.show(panelContenido, "TURNOS"));

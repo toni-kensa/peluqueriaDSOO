@@ -1,118 +1,29 @@
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServicioDAO implements DAO<Servicio, Long> {
+public class ServicioDAO {
+    private final List<Servicio> listaServicios = new ArrayList<>();
+    private int contadorId = 1;
 
-    private Connection obtenerConexion() throws SQLException {
-
-        String url = "jdbc:mysql://localhost:3306/peluqueria?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-        String usuario = "root";
-        String password = "root";
-        return DriverManager.getConnection(url, usuario, password);
-    }
-
-    @Override
     public void guardar(Servicio servicio) {
-        String sql = "INSERT INTO servicios (nombre, duracion, precio) VALUES (?, ?, ?)";
-
-        try (Connection conn = obtenerConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            pstmt.setString(1, servicio.getNombre());
-            pstmt.setInt(2, servicio.getDuracion());
-            pstmt.setDouble(3, servicio.getPrecio());
-
-            pstmt.executeUpdate();
-
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    servicio.setId(generatedKeys.getLong(1));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        servicio.setId(contadorId++);
+        listaServicios.add(servicio);
     }
 
-    @Override
-    public Servicio buscarPorId(Long id) {
-        String sql = "SELECT id, nombre, duracion, precio FROM servicios WHERE id = ?";
-        Servicio servicio = null;
-
-        try (Connection conn = obtenerConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setLong(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    servicio = new Servicio(
-                            rs.getLong("id"),
-                            rs.getString("nombre"),
-                            rs.getInt("duracion"),
-                            rs.getDouble("precio")
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return servicio;
-    }
-
-    @Override
     public List<Servicio> obtenerTodos() {
-        String sql = "SELECT id, nombre, duracion, precio FROM servicios";
-        List<Servicio> lista = new ArrayList<>();
+        return new ArrayList<>(listaServicios);
+    }
 
-        try (Connection conn = obtenerConexion();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+    public void eliminar(int id) {
+        listaServicios.removeIf(s -> s.getId() == id);
+    }
 
-            while (rs.next()) {
-                Servicio servicio = new Servicio(
-                        rs.getLong("id"),
-                        rs.getString("nombre"),
-                        rs.getInt("duracion"),
-                        rs.getDouble("precio")
-                );
-                lista.add(servicio);
+    public Servicio buscarPorId(int id) {
+        for (Servicio s : listaServicios) {
+            if (s.getId() == id) {
+                return s;
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return lista;
-    }
-
-    @Override
-    public void actualizar(Servicio servicio) {
-        String sql = "UPDATE servicios SET nombre = ?, duracion = ?, precio = ? WHERE id = ?";
-
-        try (Connection conn = obtenerConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, servicio.getNombre());
-            pstmt.setInt(2, servicio.getDuracion());
-            pstmt.setDouble(3, servicio.getPrecio());
-            pstmt.setLong(4, servicio.getId()); // ¡Usa setLong correctamente aquí!
-
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void eliminar(Long id) {
-        String sql = "DELETE FROM servicios WHERE id = ?";
-
-        try (Connection conn = obtenerConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setLong(1, id);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return null;
     }
 }

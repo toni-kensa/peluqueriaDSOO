@@ -9,7 +9,7 @@ public class ClienteControlador {
 
     public ClienteControlador(PanelCliente vista) {
         this.vista = vista;
-        this.clienteDAO = new ClienteDAO();
+        this.clienteDAO = new ClienteDAOImpl();
 
         poblarComboCategoria();
         inicializarEventos();
@@ -72,8 +72,13 @@ public class ClienteControlador {
 
         boolean aceptaPromos = (vista.getPromociones() != null) && vista.getPromociones().isSelected();
 
-        Cliente nuevo = new Cliente(0L, nombre, apellido, contacto, categoria, aceptaPromos);
-        clienteDAO.guardar(nuevo);
+        Cliente nuevo = new Cliente(0, nombre, apellido, contacto, categoria, aceptaPromos);
+        try {
+            clienteDAO.guardar(nuevo);
+        } catch (DAOException ex) {
+            mostrarError(ex);
+            return;
+        }
 
         refrescarTabla();
         vista.limpiarCampos();
@@ -109,35 +114,39 @@ public class ClienteControlador {
 
         boolean aceptaPromos = (vista.getPromociones() != null) && vista.getPromociones().isSelected();
 
-        long idCliente = Long.parseLong(vista.getModeloTabla().getValueAt(filaSeleccionada, 0).toString());
-        Cliente existente = clienteDAO.buscarPorId(idCliente);
+        int idCliente = (int) vista.getModeloTabla().getValueAt(filaSeleccionada, 0);
 
-        if (existente != null) {
-            existente.setNombre(nombre);
-            existente.setApellido(apellido);
-            existente.setContacto(contacto);
-            existente.setCategoria(categoria);
-            existente.setPromociones(aceptaPromos);
-            clienteDAO.actualizar(existente);
+        try {
+            Cliente existente = clienteDAO.buscarPorId(idCliente);
+            if (existente != null) {
+                existente.setNombre(nombre);
+                existente.setApellido(apellido);
+                existente.setContacto(contacto);
+                existente.setCategoria(categoria);
+                existente.setPromociones(aceptaPromos);
+                clienteDAO.actualizar(existente);
+            }
+        } catch (DAOException ex) {
+            mostrarError(ex);
+            return;
         }
 
         refrescarTabla();
         vista.limpiarCampos();
-        JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
-                "Cliente modificado con éxito.",
-                "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void eliminarCliente() {
-        int filaSeleccionada = vista.getFilaSeleccionada();
+        int filaSeleccionada = vista.getTablaClientes().getSelectedRow();
         if (filaSeleccionada >= 0) {
-            long idCliente = Long.parseLong(vista.getModeloTabla().getValueAt(filaSeleccionada, 0).toString());
-            clienteDAO.eliminar(idCliente);
+            int idCliente = (int) vista.getModeloTabla().getValueAt(filaSeleccionada, 0);
+            try {
+                clienteDAO.eliminar(idCliente);
+            } catch (DAOException ex) {
+                mostrarError(ex);
+                return;
+            }
             refrescarTabla();
             vista.limpiarCampos();
-            JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
-                    "Cliente eliminado con éxito.",
-                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
                     "Seleccioná un cliente de la tabla para eliminar.",
@@ -145,11 +154,23 @@ public class ClienteControlador {
         }
     }
 
+    private void mostrarError(DAOException ex) {
+        JOptionPane.showMessageDialog(vista.getPanelPrincipal(),
+                ex.getMessage() + "\n" + ex.getCause().getMessage(),
+                "Error de base de datos", JOptionPane.ERROR_MESSAGE);
+    }
+
     private void refrescarTabla() {
         DefaultTableModel model = vista.getModeloTabla();
         if (model != null) {
             model.setRowCount(0);
-            List<Cliente> lista = clienteDAO.obtenerTodos();
+            List<Cliente> lista;
+            try {
+                lista = clienteDAO.obtenerTodos();
+            } catch (DAOException ex) {
+                mostrarError(ex);
+                return;
+            }
             for (Cliente c : lista) {
                 model.addRow(new Object[]{
                         c.getId(),

@@ -2,7 +2,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class PanelTurnos extends JPanel {
+public class PanelTurnos {
 
     private JPanel panelPrincipal;
     private JComboBox<String> comboCliente;
@@ -28,10 +28,6 @@ public class PanelTurnos extends JPanel {
     private DefaultTableModel modeloTabla;
 
     public PanelTurnos() {
-        this.panelPrincipal = this;
-        if (getLayout() == null || getLayout() instanceof FlowLayout) {
-            setLayout(new BorderLayout());
-        }
         configurarComboBoxes();
         configurarTabla();
     }
@@ -41,6 +37,22 @@ public class PanelTurnos extends JPanel {
     }
 
     private void configurarComboBoxes() {
+        if (comboCliente != null) {
+            comboCliente.removeAllItems();
+            comboCliente.addItem("-- Seleccionar cliente --");
+            comboCliente.addItem("Cliente 1");
+            comboCliente.addItem("Cliente 2");
+            comboCliente.addItem("Cliente 3");
+        }
+
+        if (comboServicio != null) {
+            comboServicio.removeAllItems();
+            comboServicio.addItem("-- Seleccionar servicio --");
+            comboServicio.addItem("Servicio 1");
+            comboServicio.addItem("Servicio 2");
+            comboServicio.addItem("Servicio 3");
+        }
+
         if (comboEstado != null) {
             comboEstado.removeAllItems();
             comboEstado.addItem("Pendiente");
@@ -51,62 +63,32 @@ public class PanelTurnos extends JPanel {
     }
 
     private void configurarTabla() {
-        if (tablaTurnos == null) {
-            tablaTurnos = new JTable();
-        }
-        modeloTabla = new DefaultTableModel(
-                new Object[]{"ID", "ID Cliente", "ID Servicio", "Fecha", "Hora", "Estado"}, 0
-        ) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
+        if (tablaTurnos != null) {
+            tablaTurnos.setBackground(Color.WHITE);
+            if (tabla_turnos != null) {
+                tabla_turnos.getViewport().setBackground(Color.WHITE);
             }
-        };
-        tablaTurnos.setModel(modeloTabla);
-        if (tabla_turnos != null) {
-            tabla_turnos.setViewportView(tablaTurnos);
-            tabla_turnos.getViewport().setBackground(Color.WHITE);
-        }
-    }
 
-    public JComboBox<String> getComboCliente() {
-        return comboCliente;
-    }
-
-    public JComboBox<String> getComboServicio() {
-        return comboServicio;
-    }
-
-    public long getClienteIdSeleccionado() {
-        try {
-            if (comboCliente != null && comboCliente.getSelectedIndex() > 0) {
-                String val = comboCliente.getSelectedItem().toString();
-                // El formato es "ID: X - Nombre", extraemos la segunda parte (el número exacto)
-                String[] partes = val.split(" ");
-                if (partes.length > 1) {
-                    return Long.parseLong(partes[1]);
+            modeloTabla = new DefaultTableModel(
+                    new Object[]{"ID", "Cliente", "Servicio", "Fecha", "Hora", "Estado"}, 0
+            ) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
                 }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            };
+            tablaTurnos.setModel(modeloTabla);
         }
-        return 0L;
     }
 
-    public long getServicioIdSeleccionado() {
-        try {
-            if (comboServicio != null && comboServicio.getSelectedIndex() > 0) {
-                String val = comboServicio.getSelectedItem().toString();
-                // El formato es "ID: X - Nombre...", extraemos la segunda parte (el número exacto)
-                String[] partes = val.split(" ");
-                if (partes.length > 1) {
-                    return Long.parseLong(partes[1]);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0L;
+    public String getClienteSeleccionado() {
+        if (comboCliente == null || comboCliente.getSelectedItem() == null) return "";
+        return comboCliente.getSelectedItem().toString();
+    }
+
+    public String getServicioSeleccionado() {
+        if (comboServicio == null || comboServicio.getSelectedItem() == null) return "";
+        return comboServicio.getSelectedItem().toString();
     }
 
     public String getFecha() {
@@ -118,7 +100,7 @@ public class PanelTurnos extends JPanel {
     }
 
     public String getEstadoSeleccionado() {
-        if (comboEstado == null || comboEstado.getSelectedItem() == null) return "Pendiente";
+        if (comboEstado == null || comboEstado.getSelectedItem() == null) return "";
         return comboEstado.getSelectedItem().toString();
     }
 
@@ -146,15 +128,17 @@ public class PanelTurnos extends JPanel {
         return botonCancelar;
     }
 
-    public void cargarFormulario(long clienteId, long servicioId, String fecha, String hora, String estado) {
+    public void cargarFormulario(String cliente, String servicio, String fecha, String hora, String estado) {
+        if (comboCliente != null) comboCliente.setSelectedItem(cliente);
+        if (comboServicio != null) comboServicio.setSelectedItem(servicio);
         if (fechaTX != null) fechaTX.setText(fecha);
         if (horaTX != null) horaTX.setText(hora);
         if (comboEstado != null) comboEstado.setSelectedItem(estado);
     }
 
     public void limpiarCampos() {
-        if (comboCliente != null && comboCliente.getItemCount() > 0) comboCliente.setSelectedIndex(0);
-        if (comboServicio != null && comboServicio.getItemCount() > 0) comboServicio.setSelectedIndex(0);
+        if (comboCliente != null) comboCliente.setSelectedIndex(0);
+        if (comboServicio != null) comboServicio.setSelectedIndex(0);
         if (fechaTX != null) fechaTX.setText("");
         if (horaTX != null) horaTX.setText("");
         if (comboEstado != null) comboEstado.setSelectedIndex(0);
